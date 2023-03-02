@@ -1,0 +1,46 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    text-decoration: none;
+
+    font: normal 500px 16px 'SimSun';
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ffffff;
+}
+
+.main {
+    display: inline-block;
+    width: 100%;
+    height: 600px;
+    background-color: rgb(122, 122, 122);
+    color: black;
+    text-decoration: none;
+}
+
+.in {
+    display: inline-block;
+    margin: 100px;
+    padding: 30px;
+    width: 60%;
+    height: 300px;
+    background-color: rgb(0, 0, 0);
+    box-shadow: -25px 25px 21px rgb(30 30 30 / 42%);
+    font: normal 500px 16px 'SimSun';
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fefefe;
+}
+
+li {
+    padding: 10px;
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+}
+
+li:visited {
+    color: rgb(243, 242, 242);
+}
+
+.dark {
+    color: rgb(255, 255, 255);
+    background-color: black;
+}
