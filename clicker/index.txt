@@ -7,7 +7,7 @@ Let's make a game!
 	version:1
 
 Settings
-	background:https://i.imgloc.com/2023/07/06/Vm8hgz.jpeg
+	background:background.JPG
 	building cost increase:110%
 	building cost refund:50%
 	spritesheet:icons, 48 by 48, stuff/bunnyIcons.png
