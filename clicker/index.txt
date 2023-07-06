@@ -7,7 +7,7 @@ Let's make a game!
 	version:1
 
 Settings
-	background:background.JPG
+	background:https://djh2203.github.io/clicker/background.JPG
 	building cost increase:1100%
 	building cost refund:50%
 	spritesheet:icons, 48 by 48, stuff/bunnyIcons.png
