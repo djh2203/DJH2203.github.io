@@ -1,193 +1,1289 @@
-<!--
-                   _ooOoo_
-                  o8888888o
-                  88" . "88
-                  (| -_- |)
-                  O\  =  /O
-               ____/`---'\____
-             .'  \\|     |//  `.
-            /  \\|||  :  |||//  \
-           /  _||||| -:- |||||-  \
-           |   | \\\  -  /// |   |
-           | \_|  ''\---/''  |   |
-           \  .-\__  `-`  ___/-. /
-         ___`. .'  /--.--\  `. . __
-      ."" '<  `.___\_<|>_/___.'  >'"".
-     | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-     \  \ `-.   \_ __\ /__ _/   .-` /  /
-======`-.____`-.___\_____/___.-`____.-'======
-                   `=---='
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    佛祖保佑       永不宕机     永无BUG
--->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <title>blog of djh2203</title>
+    <meta name="description" content="一个基于WebGL的沉浸式滚动博客" />
+    <meta
+      name="theme-color"
+      content="#0a0a0f"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta
+      name="theme-color"
+      content="#eef4ff"
+      media="(prefers-color-scheme: light)"
+    />
 
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-
-
+    <!-- 预连接 Google Fonts + 字体显示优化 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+      /* 字体回退，避免 FOIT */
+      * {
+        font-display: swap;
+      }
+      /* 其余样式保持不变，仅添加焦点可见性 */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
+      :root {
+        color-scheme: dark;
+
+        --dark-bg: #0a0a0f;
+        --dark-fg: #e8e4d9;
+        --dark-muted: #6a6a7e;
+        --dark-accent: #c8ff47;
+        --dark-card-bg: rgba(10, 10, 15, 0.16);
+        --dark-card-border: rgba(200, 255, 71, 0.18);
+
+        --light-bg: #eef4ff;
+        --light-fg: #0b141a;
+        --light-muted: #6c8296;
+        --light-accent: #1b7ed6;
+        --light-card-bg: rgba(245, 249, 255, 0.82);
+        --light-card-border: rgba(27, 126, 214, 0.22);
+
+        --bg: var(--dark-bg);
+        --fg: var(--dark-fg);
+        --muted: var(--dark-muted);
+        --accent: var(--dark-accent);
+        --card-bg: var(--dark-card-bg);
+        --card-border: var(--dark-card-border);
+
+        --font-display: "Bebas Neue", sans-serif;
+        --font-mono: "DM Mono", monospace;
+        --hairline: 0.0625rem;
+        --ui-inset: 2rem;
+        --nav-x: calc(var(--ui-inset) + 0.125rem);
+        --reveal-offset: 0.625rem;
+        --reveal-duration: 0.5s;
+        --z-ui: 10;
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --bg: var(--light-bg);
+        --fg: var(--light-fg);
+        --muted: var(--light-muted);
+        --accent: var(--light-accent);
+        --card-bg: var(--light-card-bg);
+        --card-border: var(--light-card-border);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-mono);
+        overflow-x: hidden;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+      }
+
+      #webgl-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      #hud {
+        position: fixed;
+        top: var(--ui-inset);
+        right: var(--ui-inset);
+        z-index: var(--z-ui);
+        text-align: right;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      #hud .progress-bar {
+        width: 7.5rem;
+        height: var(--hairline);
+        background: var(--muted);
+        margin-block-start: 0.5rem;
+        margin-inline-start: auto;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #hud .progress-fill {
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: 0;
+        width: 0%;
+        background: var(--accent);
+        transition: width 0.1s linear;
+      }
+
+      #hud .scene-label {
+        font-size: 0.6rem;
+        color: var(--accent);
+        margin-block-start: 0.4rem;
+      }
+
+      /* 桌面端场景点列 */
+      #scene-strip {
+        position: fixed;
+        left: var(--nav-x);
+        top: 50%;
+        translate: -50% -50%;
+        z-index: var(--z-ui);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .scene-dot {
+        width: 0.25rem;
+        height: 0.25rem;
+        border-radius: 50%;
+        background: var(--muted);
+        transition:
+          background 0.3s,
+          scale 0.3s;
+        cursor: pointer;
+      }
+
+      .scene-dot.active {
+        background: var(--accent);
+        scale: 1.8;
+      }
+
+      /* 移动端水平场景点 (默认隐藏) */
+      #mobile-scene-strip {
+        position: fixed;
+        bottom: 1.25rem;
+        left: 0;
+        right: 0;
+        display: none;
+        justify-content: center;
+        gap: 0.75rem;
+        z-index: var(--z-ui);
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(4px);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        width: fit-content;
+        margin: 0 auto;
+        pointer-events: auto;
+      }
+      .mobile-dot {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 50%;
+        background: var(--muted);
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .mobile-dot.active {
+        background: var(--accent);
+        scale: 1.5;
+      }
+
+      #theme-toggle {
+        position: fixed;
+        bottom: var(--ui-inset);
+        left: var(--nav-x);
+        translate: -50% 0;
+        z-index: var(--z-ui);
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        background: color-mix(in srgb, var(--muted) 35%, transparent);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
+      }
+
+      #theme-toggle:hover {
+        background: color-mix(in srgb, var(--muted) 55%, transparent);
+      }
+
+      #theme-toggle svg {
+        width: 0.875rem;
+        height: 0.875rem;
+        position: absolute;
+        transition:
+          opacity 0.3s ease,
+          rotate 0.3s ease;
+        color: var(--accent);
+      }
+
+      :root[data-theme="light"] #theme-toggle svg {
+        color: var(--fg);
+      }
+
+      #theme-toggle .icon-sun {
+        opacity: 1;
+        rotate: 0deg;
+      }
+
+      #theme-toggle .icon-moon {
+        opacity: 0;
+        rotate: 90deg;
+      }
+
+      :root[data-theme="light"] #theme-toggle .icon-sun {
+        opacity: 0;
+        rotate: -90deg;
+      }
+
+      :root[data-theme="light"] #theme-toggle .icon-moon {
+        opacity: 1;
+        rotate: 0deg;
+      }
+
+      #scroll-container {
+        position: relative;
+        z-index: 1;
+      }
+
+      section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 6rem 5rem;
+      }
+
+      .text-card {
+        max-width: 50rem;
+        padding: 2.25rem 2rem;
+        background: var(--card-bg);
+        border-left: var(--hairline) solid var(--card-border);
+        transition:
+          background 0.3s ease,
+          border-color 0.3s ease;
+      }
+
+      :root[data-theme="dark"] .text-card {
+        border: var(--hairline) solid var(--card-border);
+        border-radius: 14px;
+        backdrop-filter: blur(14px) saturate(130%);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .text-card.right {
+        margin-inline-start: auto;
+        border-left: none;
+        border-right: var(--hairline) solid var(--card-border);
+        text-align: right;
+      }
+
+      .text-card.center {
+        margin-inline: auto;
+        border-left: none;
+        border-top: var(--hairline) solid var(--card-border);
+        text-align: center;
+        max-width: 28.75rem;
+      }
+
+      .tag {
+        font-size: 0.6rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-block-end: 1.1rem;
+        opacity: 0;
+        translate: 0 var(--reveal-offset);
+        transition:
+          opacity var(--reveal-duration) ease,
+          translate var(--reveal-duration) ease;
+      }
+
+      .tag.visible {
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      h1,
+      h2 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        line-height: 0.92;
+        opacity: 0;
+        translate: 0 1.125rem;
+        transition:
+          opacity var(--reveal-duration) ease 0.08s,
+          translate var(--reveal-duration) ease 0.08s;
+      }
+
+      h1.visible,
+      h2.visible {
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 8vw, 6.5rem);
+      }
+      h2 {
+        font-size: clamp(2.2rem, 6vw, 5rem);
+      }
+
+      .body-text {
+        font-size: 0.78rem;
+        line-height: 1.8;
+        color: color-mix(in srgb, var(--fg) 55%, transparent);
+        margin-block-start: 1.25rem;
+        opacity: 0;
+        translate: 0 var(--reveal-offset);
+        transition:
+          opacity var(--reveal-duration) ease 0.2s,
+          translate var(--reveal-duration) ease 0.2s;
+      }
+
+      .body-text.visible {
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      .stat-row {
+        display: flex;
+        gap: 2.5rem;
+        margin-block-start: 2rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        translate: 0 var(--reveal-offset);
+        transition:
+          opacity var(--reveal-duration) ease 0.3s,
+          translate var(--reveal-duration) ease 0.3s;
+      }
+
+      .stat-row.visible {
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .stat-num {
+        font-family: var(--font-display);
+        font-size: 2.2rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+
+      .stat-label {
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .h-line {
+        width: 3.125rem;
+        height: var(--hairline);
+        background: var(--accent);
+        margin-block-end: 1.2rem;
+        opacity: 0;
+        scale: 0 1;
+        transform-origin: left;
+        transition:
+          opacity 0.4s ease,
+          scale 0.4s ease;
+      }
+
+      .h-line.visible {
+        opacity: 1;
+        scale: 1 1;
+      }
+
+      .text-card.right .h-line {
+        transform-origin: right;
+        margin-inline-start: auto;
+      }
+
+      .text-card.center .h-line {
+        transform-origin: center;
+        margin-inline: auto;
+        margin-block-end: 1.2rem;
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-block-start: 1.75rem;
+        padding: 0.6rem 1.25rem;
+        border: var(--hairline) solid var(--accent);
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        opacity: 0;
+        translate: 0 var(--reveal-offset);
+        transition:
+          opacity var(--reveal-duration) ease 0.35s,
+          translate var(--reveal-duration) ease 0.35s,
+          background 0.2s,
+          color 0.2s;
+      }
+
+      .cta.visible {
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      .cta:hover {
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      .cta:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .cta svg {
+        width: 0.6875rem;
+        height: 0.6875rem;
+      }
+
+      #credit {
+        position: fixed;
+        right: var(--ui-inset);
+        top: 50%;
+        transform: translateY(-50%) rotate(-90deg);
+        transform-origin: right center;
+        z-index: var(--z-ui);
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+      }
+
+      #credit a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      #credit a:hover {
+        color: var(--accent);
+      }
+
+      @media (width <= 60em) {
+        section {
+          padding: 5rem 3rem;
         }
-
-
-        .top {
-            text-align: center;
-            background: rgb(6, 41, 71) url(images/background_head.jpg) no-repeat scroll top;
-            width: 100%;
-            background-position-y: -1000px;
-
-
+        .text-card {
+          max-width: 20rem;
         }
+      }
 
-
-
-
-        h1 {
-            font-size: 40px;
-            margin: 30px 0px 0px;
-            color: rgb(6, 48, 78);
-            font-family: Tempus Sans ITC;
-            font-family: 'Tempus Sans ITC', 'Segoe Script', 'Old English Text MT';
+      @media (width <= 37.5em) {
+        :root {
+          --ui-inset: 1.25rem;
         }
-
-        h2 {
-            color: rgb(6, 48, 78);
-            margin: 40px 0px;
+        section {
+          padding: 4rem 1.25rem;
         }
-
-        .nav {
-            height: 55px;
-            background-color: rgb(31, 60, 107);
-            line-height: 55px;
+        .text-card {
+          max-width: 100%;
         }
-
-        .nav a {
-            display: inline-flex;
-            display: inline-block;
-            height: 55px;
-            padding: 0 40px;
-            font-size: 16px;
-            color: #ffffff;
-            background-color: rgb(31, 60, 107);
-            text-decoration: none;
+        .text-card.right,
+        .text-card.center {
+          margin-inline: 0;
+          text-align: left;
+          border-right: none;
+          border-top: none;
+          border-left: var(--hairline) solid var(--card-border);
         }
-
-        .nav a:hover {
-            background-color: rgba(255, 0, 0, 0.2);
-            color: rgb(184, 179, 178);
+        .text-card.right .h-line,
+        .text-card.center .h-line {
+          transform-origin: left;
+          margin-inline-start: 0;
+          margin-inline: 0;
         }
-
-        .article {
-            display: flex;
-            width: 850px;
-            height: 250px;
-            padding: 20px;
-            background-color: rgb(3, 19, 44);
-            margin: 15px 0px 15px 40px;
-            border: 1px solid white;
+        #hud {
+          top: 1rem;
+          right: 1rem;
         }
-
-        .img {
-            display: inline-block;
-            width: 400px;
-            height: 250px;
+        #scene-strip {
+          display: none;
         }
-
-
-
-
-        .title {
-            display: inline-block;
-            width: 350px;
-            color: #ffffff;
-            margin: 0px 5px 0px 25px;
+        #mobile-scene-strip {
+          display: flex;
         }
-
-
-
-
-        .post-title {
-            display: inline-block;
-            width: 350px;
-            color: #ffffff;
-            line-height: 30px;
-            font-size: 20px;
+        #theme-toggle {
+          bottom: 1rem;
+          left: 1.25rem;
+          translate: 0 0;
         }
-
-        .post-title:hover {
-            width: 350px;
-            color: #ffffff;
-            line-height: 35px;
-            font-size: 25px;
-            margin: 5px 0px 0px 5px;
+        .stat-row {
+          gap: 1.5rem;
         }
-
-        .text {
-            display: inline-block;
-            color: rgb(125, 147, 178);
-            margin: 25px 0px 0px 0px;
-            text-indent: 2em;
-        }
-
-        .text:hover {
-            color: rgb(255, 255, 255);
-            font-size: 17px;
-            margin: 20px 0px 0px 5px;
-        }
-
-
-        .date {
-            display: inline-block;
-            color: rgb(125, 147, 178);
-            margin: 50px 0px 0px 0px;
-
-        }
-
-        .date:hover {
-            color: rgb(255, 255, 255);
-            font-size: 17px;
-            margin: 45px 0px 5px 2px;
-        }
+      }
     </style>
-</head>
-
-
-<body style="background-color: rgb(3, 19, 44);">
-
-    <div class="top">
-        <img src="images/head.png" width="140px" style="margin: 100px 0px 0px;">
-        <h1>D&nbsp; J&nbsp; H</h1>
-        <h2>青岛九中高一三班在读</h2>
-        <h1>&nbsp; </h1>
-
+  </head>
+  <body>
+    <canvas id="webgl-canvas"></canvas>
+    <div id="hud">
+      <div id="hud-pct">000%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="prog-fill"></div>
+      </div>
+      <div class="scene-label" id="scene-name">DJH2203</div>
     </div>
 
-    <div class="nav">
-        <a href="#">首页</a>
-        <a href="#">文章</a>
-        <a href="project.html">产品</a>
+    <!-- 移动端场景指示器 -->
+    <div id="mobile-scene-strip"></div>
+
+    <button id="theme-toggle" aria-label="Toggle light/dark mode">
+      <svg
+        class="icon-sun"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+        />
+      </svg>
+      <svg
+        class="icon-moon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+      </svg>
+    </button>
+
+    <div id="scene-strip">
+      <div class="scene-dot" data-scene="0"></div>
+      <div class="scene-dot" data-scene="1"></div>
+      <div class="scene-dot" data-scene="2"></div>
+      <div class="scene-dot" data-scene="3"></div>
+      <div class="scene-dot" data-scene="4"></div>
     </div>
-    
-    <a href="articles\a1.html" title="一个工具箱">
-        <div class="article">
-            <div class="img"><img src="images/1.png"></div>
-            <div class="title">
-                <div class="post-title">一个工具箱</div>
-                <div class="text">现在，解决一个工具箱的问题，是非常非常重要的。 所以， 一个工具箱，到底应该如何实现。 奥普拉·温弗瑞曾经说过，你相信什么，你就成为什.....</div>
-                <div class="date">post on 1.1&nbsp;&nbsp;|&nbsp;&nbsp;by DJH</div>
-            </div>
+
+    <div id="scroll-container">
+      <section id="s0">
+        <div class="text-card">
+          <div class="tag">who I am</div>
+          <h1>
+            hi,I am<br /><i><b style="color: #c8ff47">DJH2203</b></i>
+          </h1>
+          <p class="body-text">A student, a builder, a curious mind.</p>
+          <a class="cta" target="_blank" href="https://github.com/djh2203/">
+            follow me on github
+            <svg
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M1 6h10M6 1l5 5-5 5" />
+            </svg>
+          </a>
         </div>
-    </a>
+      </section>
 
+      <section id="s1">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">where I am</div>
+          <h2>Qingdao<br />University</h2>
+          <p class="body-text">
+            A coastal university where technology meets the sea.<br />
+            Qingdao, China — 120.4°E, 36.1°N.
+          </p>
+          <div class="stat-row" style="justify-content: flex-end">
+            <div class="stat">
+              <span class="stat-num">120.4°E</span>
+              <span class="stat-label">Longitude</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">36.1°N</span>
+              <span class="stat-label">Latitude</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num"></span>
+              <span class="stat-label"></span>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <section id="s2">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">Major</div>
+          <h2>Computer <br />Science</h2>
+          <p class="body-text">
+            Exploring the digital ocean — from algorithms to applications.<br />
+            Passionate about building things that make life smarter.
+          </p>
+          <a class="cta" href="#s3">
+            Continue
+            <svg
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M1 6h10M6 1l5 5-5 5" />
+            </svg>
+          </a>
+        </div>
+      </section>
 
+      <section id="s3">
+        <div class="text-card center">
+          <div class="h-line"></div>
+          <div class="tag">year</div>
+          <h2>Freshman</h2>
+          <p class="body-text">
+            Class of 2025, Drake Joint Institute<br />
+            Qingdao University. Just getting started.
+          </p>
+        </div>
+      </section>
 
-</body>
+      <section id="s4">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">Project</div>
+          <h2>Phone<br />Phoenix</h2>
+          <p class="body-text">
+            Turn your old Android into a smart home hub.<br />
+            Voice assistant, camera monitor, music server — all in one.<br />
+            <a
+              class="cta"
+              target="_blank"
+              href="https://github.com/djh2203/PhonePhoenix"
+            >
+              Learn more
+              <svg
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path d="M1 6h10M6 1l5 5-5 5" />
+              </svg>
+            </a>
+          </p>
+        </div>
+      </section>
+    </div>
+    <section id="s5">
+      <div class="text-card right">
+        <div class="h-line"></div>
+        <div class="tag">Connect me</div>
+        <p class="body-text">
+          📧 hehe22032007@outlook.com<br />
+          📞 +86 19819999003<br />
+        </p>
+      </div>
+    </section>
 
+    <div id="credit">
+      <a href="https://github.com/djh2203" target="_blank" rel="noopener"
+        >DJH2203 · GitHub</a
+      >
+    </div>
+
+    <!-- 顶点着色器模板 -->
+    <script type="x-shader/x-vertex" id="vs-source">
+      attribute vec2 a;
+      void main() {
+          gl_Position = vec4(a, 0.0, 1.0);
+      }
+    </script>
+    <!-- 片段着色器 (内容不变，但为了可读性外部化) -->
+    <script type="x-shader/x-fragment" id="fs-source">
+      precision highp float;
+      uniform vec2  uR;
+      uniform float uT, uS, uSc, uBl;
+      uniform vec3  uBg;
+      #define PI 3.14159265359
+      // 动态步数 (通过uniform控制，但这里硬编码由JS动态替换，简化)
+      // 为性能，移动端使用较少步数，但在shader中无法动态修改宏，故采用JS构建时替换
+      // 这里我们使用固定步数，但通过JS预编译不同版本？实际上更好的方式是让步数作为uniform，但循环次数必须常量。
+      // 简便方法：在移动端使用另一个shader字符串，性能关键。
+      // 由于步数是常量，我们将在JS初始化时根据设备选择不同步数的shader字符串，保证移动端少循环。
+      // 为了方便，直接在JS中动态拼接shader。因此这里只留占位，实际shader由JS生成。
+    </script>
+
+    <script>
+      (function () {
+        // 检测移动端 (粗略)
+        const isMobile =
+          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          window.innerWidth <= 768;
+        // 步数配置
+        const MARCH_STEPS = isMobile ? 10 : 12;
+        const REFINE_STEPS = isMobile ? 2 : 5;
+
+        // 构建片段着色器源码 (动态替换步数)
+        const fsTemplate = `
+        precision highp float;
+
+        uniform vec2  uR;
+        uniform float uT, uS, uSc, uBl;
+        uniform vec3  uBg;
+
+        #define PI 3.14159265359
+        #define MARCH_STEPS ${MARCH_STEPS}
+        #define REFINE_STEPS ${REFINE_STEPS}
+
+        vec3 sCol(vec3 c0, vec3 c1, vec3 c2, vec3 c3, vec3 c4) {
+          int si = int(uSc);
+          vec3 a = c0, b = c1;
+          if (si == 1) { a = c1; b = c2; }
+          else if (si == 2) { a = c2; b = c3; }
+          else if (si == 3) { a = c3; b = c4; }
+          return mix(a, b, uBl);
+        }
+
+        float sF(float c0, float c1, float c2, float c3, float c4) {
+          int si = int(uSc);
+          float a = c0, b = c1;
+          if (si == 1) { a = c1; b = c2; }
+          else if (si == 2) { a = c2; b = c3; }
+          else if (si == 3) { a = c3; b = c4; }
+          return mix(a, b, uBl);
+        }
+
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+        }
+
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          float a = hash(i);
+          float b = hash(i + vec2(1.0, 0.0));
+          float c = hash(i + vec2(0.0, 1.0));
+          float d = hash(i + vec2(1.0, 1.0));
+          return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+        }
+
+        float waveH(vec2 p, float t, float amp) {
+          float h = 0.0;
+          vec2 swellDir = normalize(vec2(1.0, 0.35));
+          float d = dot(p, swellDir);
+          h += amp * 0.28 * sin(d * 0.80 + t * 0.60);
+          h += amp * 0.40 * sin(p.x * 0.70 + t * 0.55 + p.y * 0.28);
+          h += amp * 0.24 * sin(p.x * 1.60 - t * 0.82 + p.y * 0.72);
+          h += amp * 0.16 * sin(p.x * 3.10 + t * 1.15 - p.y * 0.50);
+          h += amp * 0.10 * sin(p.x * 5.50 - t * 1.70 + p.y * 1.30);
+          h += amp * 0.05 * sin(p.x * 8.60 + t * 2.20 + p.y * 1.95);
+          float micro = noise(p * 18.0 + vec2(t * 0.35, t * 0.12)) * 0.010;
+          h += micro * amp;
+          return h;
+        }
+
+        vec3 waveNorm(vec2 p, float t, float amp) {
+          float e = 0.014;
+          float hL = waveH(p - vec2(e, 0.0), t, amp);
+          float hR = waveH(p + vec2(e, 0.0), t, amp);
+          float hD = waveH(p - vec2(0.0, e), t, amp);
+          float hU = waveH(p + vec2(0.0, e), t, amp);
+          return normalize(vec3(-(hR - hL) / (2.0 * e), 1.0, -(hU - hD) / (2.0 * e)));
+        }
+
+        void main() {
+          vec2 uv = (gl_FragCoord.xy - uR * 0.5) / uR.y;
+          vec3 ro = vec3(sin(uT * 0.07) * 0.02, 1.1 + sin(uT * 0.11) * 0.01, 0.0);
+          vec3 rd = normalize(vec3(uv.x, uv.y - 0.10, -1.4));
+
+          vec3 skyTop  = sCol(vec3(0.18,0.06,0.24), vec3(0.05,0.24,0.68), vec3(0.26,0.06,0.04), vec3(0.01,0.01,0.05), vec3(0.04,0.05,0.09));
+          vec3 skyHori = sCol(vec3(0.92,0.48,0.18), vec3(0.42,0.62,0.90), vec3(0.88,0.32,0.04), vec3(0.03,0.05,0.14), vec3(0.15,0.17,0.23));
+          vec3 sunCol   = sCol(vec3(1.0,0.62,0.22), vec3(1.0,0.96,0.80), vec3(1.0,0.38,0.05), vec3(0.70,0.75,0.94), vec3(0.26,0.28,0.34));
+          vec3 seaDeep  = sCol(vec3(0.08,0.05,0.12), vec3(0.03,0.14,0.34), vec3(0.10,0.06,0.04), vec3(0.00,0.01,0.03), vec3(0.03,0.04,0.07));
+          vec3 seaShlo  = sCol(vec3(0.28,0.17,0.24), vec3(0.09,0.38,0.60), vec3(0.24,0.13,0.06), vec3(0.04,0.06,0.16), vec3(0.07,0.10,0.14));
+          vec3 fogCol   = sCol(vec3(0.80,0.50,0.30), vec3(0.58,0.72,0.90), vec3(0.70,0.28,0.05), vec3(0.02,0.03,0.08), vec3(0.12,0.14,0.18));
+
+          float sunProgress = clamp(uS / 0.58, 0.0, 1.0);
+          float sunAngle = sunProgress * PI;
+          float sunArcX = cos(sunAngle) * -0.75;
+          float sunArcY = sin(sunAngle) * 0.38 - 0.08;
+          vec3 sunDir  = normalize(vec3(sunArcX, sunArcY, -1.0));
+          vec3 moonDir = normalize(vec3(-0.14, 0.42, -1.0));
+
+          float warm = smoothstep(0.22, -0.08, sunDir.y);
+          sunCol = mix(sunCol, vec3(1.0, 0.55, 0.25), warm * 0.35);
+
+          float waveAmp = sF(0.08, 0.07, 0.10, 0.05, 0.34);
+          float fogDen  = sF(0.018, 0.010, 0.020, 0.032, 0.048);
+          float moonAmt = sF(0.0, 0.0, 0.05, 0.92, 0.06);
+          float sunAbove = step(0.0, sunDir.y);
+          float sunGlow  = smoothstep(-0.10, 0.06, sunDir.y);
+
+          vec3 col;
+          if (rd.y < 0.0) {
+            float tFlat = ro.y / (-rd.y);
+            float baseStep = tFlat / float(MARCH_STEPS);
+            float t = baseStep;
+            for (int i = 0; i < MARCH_STEPS; i++) {
+              vec2 wpTest = ro.xz + rd.xz * t;
+              float wy = ro.y + rd.y * t;
+              if (wy < waveH(wpTest, uT, waveAmp)) break;
+              t += baseStep;
+            }
+            float ta = t - baseStep;
+            float tb = t;
+            for (int i = 0; i < REFINE_STEPS; i++) {
+              float tm = (ta + tb) * 0.5;
+              vec2 wpm = ro.xz + rd.xz * tm;
+              if (ro.y + rd.y * tm < waveH(wpm, uT, waveAmp)) tb = tm;
+              else ta = tm;
+            }
+            t = (ta + tb) * 0.5;
+            vec2 wp = ro.xz + rd.xz * t;
+            vec3 n = waveNorm(wp, uT, waveAmp);
+            vec3 vDir = -rd;
+            float fres = pow(1.0 - clamp(dot(n, vDir), 0.0, 1.0), 4.0);
+            vec3 refl = reflect(rd, n);
+            float rh = clamp(refl.y, 0.0, 1.0);
+            vec3 reflSky = mix(skyHori, skyTop, pow(rh, 0.42));
+            reflSky = mix(reflSky, skyHori, 0.12);
+            float rSun = max(dot(refl, sunDir), 0.0);
+            reflSky += sunCol * pow(rSun, 128.0) * 2.2 * sunGlow;
+            reflSky += sunCol * pow(rSun, 18.0) * 0.08 * sunGlow;
+            if (moonAmt > 0.04) {
+              float rMoon = max(dot(refl, moonDir), 0.0);
+              reflSky += vec3(0.72, 0.80, 0.95) * pow(rMoon, 128.0) * 0.8 * moonAmt;
+            }
+            float depth = exp(-t * 0.40);
+            vec3 waterC = mix(seaDeep, seaShlo, depth * 0.5);
+            vec3 absorb = vec3(0.78, 0.90, 1.0);
+            waterC *= mix(vec3(1.0), absorb, clamp(t * 0.35, 0.0, 1.0));
+            float stormTex = noise(wp * 1.9 + vec2(uT * 0.24, uT * 0.08));
+            waterC += stormTex * 0.018 * smoothstep(0.75, 1.0, uS);
+            col = mix(waterC, reflSky, 0.15 + fres * 0.35);
+            float spec = pow(max(dot(reflect(-sunDir, n), vDir), 0.0), 220.0);
+            col += sunCol * spec * 1.25 * sunAbove;
+            float broadSpec = pow(max(dot(reflect(-sunDir, n), vDir), 0.0), 36.0);
+            col += sunCol * broadSpec * 0.14 * sunGlow;
+            float sunLine = pow(max(dot(reflect(rd, n), sunDir), 0.0), 10.0);
+            col += sunCol * sunLine * 0.32 * smoothstep(0.0, 0.35, -rd.y) * sunGlow;
+            float sparkle = noise(wp * 24.0 + vec2(uT * 0.8, uT * 0.35));
+            sparkle = smoothstep(0.92, 1.0, sparkle);
+            col += sunCol * sparkle * 0.12 * sunGlow * sunAbove;
+            if (moonAmt > 0.04) {
+              float mSpec = pow(max(dot(reflect(-moonDir, n), vDir), 0.0), 600.0);
+              col += vec3(0.72, 0.80, 0.95) * mSpec * 0.11 * moonAmt;
+            }
+            float hC = waveH(wp, uT, waveAmp);
+            float hL = waveH(wp - vec2(0.02,0.0), uT, waveAmp);
+            float hR = waveH(wp + vec2(0.02,0.0), uT, waveAmp);
+            float hD = waveH(wp - vec2(0.0,0.02), uT, waveAmp);
+            float hU = waveH(wp + vec2(0.0,0.02), uT, waveAmp);
+            float curvature = hR + hL + hU + hD - 4.0 * hC;
+            float foam = clamp(curvature * 28.0, 0.0, 1.0);
+            col += foam * vec3(1.0) * 0.10 * smoothstep(0.70, 1.0, uS);
+            float fog = 1.0 - exp(-t * fogDen);
+            col = mix(col, fogCol, fog);
+          } else {
+            float h = clamp(rd.y, 0.0, 1.0);
+            col = mix(skyHori, skyTop, pow(h, 0.38));
+          }
+          float horizonW = 0.008;
+          float skyMix = smoothstep(-horizonW, horizonW, rd.y);
+          vec3 skyCol;
+          {
+            float h = clamp(rd.y, 0.0, 1.0);
+            skyCol = mix(skyHori, skyTop, pow(h, 0.38));
+            float sd = max(dot(rd, sunDir), 0.0);
+            skyCol += sunCol * pow(sd, 420.0) * 7.2 * sunGlow;
+            skyCol += sunCol * pow(sd, 24.0)  * 0.22 * sunGlow;
+            skyCol += sunCol * pow(sd, 5.0)   * 0.10 * sunGlow;
+            float sunDisk = smoothstep(0.9992, 0.99995, dot(rd, sunDir));
+            skyCol += sunCol * sunDisk * 2.8 * sunGlow;
+            float halo = pow(max(dot(rd, sunDir), 0.0), 2.0);
+            skyCol += sunCol * halo * 0.04 * sunGlow;
+            float horizonBand = exp(-abs(rd.y) * 24.0);
+            skyCol += sunCol * horizonBand * 0.12 * sunGlow;
+            float viewSun = max(dot(rd, sunDir), 0.0);
+            skyCol += sunCol * pow(viewSun, 3.0) * 0.04 * sunGlow;
+            if (moonAmt > 0.04) {
+              float md = max(dot(rd, moonDir), 0.0);
+              skyCol += vec3(0.88, 0.92, 1.0) * pow(md, 900.0) * 8.0 * moonAmt;
+              skyCol += vec3(0.88, 0.92, 1.0) * pow(md, 6.0)   * 0.05 * moonAmt;
+            }
+            float horizonMist = exp(-abs(rd.y) * 40.0);
+            skyCol += fogCol * horizonMist * 0.08;
+            float horizonFade = exp(-abs(rd.y) * 18.0);
+            float lum = dot(skyCol, vec3(0.3333333));
+            skyCol = mix(skyCol, vec3(lum), horizonFade * 0.12);
+          }
+          col = mix(col, skyCol, skyMix);
+          float hEdge = smoothstep(-0.008, 0.018, rd.y);
+          col = mix(fogCol, col, hEdge * 0.25 + 0.75);
+          vec2 uvV = (gl_FragCoord.xy - uR * 0.5) / uR.y;
+          float vignette = smoothstep(1.15, 0.35, length(uvV));
+          col = mix(uBg, col, vignette);
+          float grain = hash(gl_FragCoord.xy + uT * 60.0) - 0.5;
+          col += grain * 0.004;
+          gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+        }
+        `;
+
+        const canvas = document.getElementById("webgl-canvas");
+        const gl = canvas.getContext("webgl", {
+          alpha: false,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          preserveDrawingBuffer: false,
+          powerPreference: "high-performance",
+        });
+
+        if (!gl) {
+          canvas.style.background = "#0a0a0f";
+          console.error("WebGL not supported");
+          return;
+        }
+
+        // 编译着色器
+        const vsSource = document.getElementById("vs-source").innerText;
+        const fsSource = fsTemplate;
+
+        const mkShader = (type, src) => {
+          const s = gl.createShader(type);
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(s));
+            gl.deleteShader(s);
+            return null;
+          }
+          return s;
+        };
+
+        const vert = mkShader(gl.VERTEX_SHADER, vsSource);
+        const frag = mkShader(gl.FRAGMENT_SHADER, fsSource);
+        if (!vert || !frag) throw new Error("Shader compilation failed");
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vert);
+        gl.attachShader(prog, frag);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          console.error(gl.getProgramInfoLog(prog));
+          throw new Error("Program linking failed");
+        }
+        gl.useProgram(prog);
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+        gl.disable(gl.BLEND);
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+          gl.STATIC_DRAW,
+        );
+        const ap = gl.getAttribLocation(prog, "a");
+        gl.enableVertexAttribArray(ap);
+        gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+
+        const uR = gl.getUniformLocation(prog, "uR");
+        const uTi = gl.getUniformLocation(prog, "uT");
+        const uScroll = gl.getUniformLocation(prog, "uS");
+        const uScene = gl.getUniformLocation(prog, "uSc");
+        const uBlend = gl.getUniformLocation(prog, "uBl");
+        const uBg = gl.getUniformLocation(prog, "uBg");
+
+        const hexToVec3 = (hex) => {
+          const n = parseInt(hex.replace("#", ""), 16);
+          return [
+            ((n >> 16) & 255) / 255,
+            ((n >> 8) & 255) / 255,
+            (n & 255) / 255,
+          ];
+        };
+        const bgColors = { dark: "#0a0a0f", light: "#545457" };
+        const updateBg = (theme) => {
+          const [r, g, b] = hexToVec3(bgColors[theme] ?? bgColors.dark);
+          gl.uniform3f(uBg, r, g, b);
+        };
+
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        const getSystemTheme = () => (mq.matches ? "dark" : "light");
+        const applyTheme = (theme) => {
+          document.documentElement.setAttribute("data-theme", theme);
+          document.documentElement.style.colorScheme = theme;
+          updateBg(theme);
+        };
+        applyTheme(getSystemTheme());
+        mq.addEventListener("change", (e) =>
+          applyTheme(e.matches ? "dark" : "light"),
+        );
+        const themeToggleBtn = document.getElementById("theme-toggle");
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener("click", () => {
+            const current =
+              document.documentElement.getAttribute("data-theme") ||
+              getSystemTheme();
+            applyTheme(current === "dark" ? "light" : "dark");
+          });
+        }
+
+        // 滚动与UI逻辑
+        const N_SCENES = 5;
+        const NAMES = ["黎明", "正午", "黄昏", "夜晚", "暴风"];
+        let maxScroll = 1;
+        let tgt = 0;
+        let smooth = 0;
+
+        const progFill = document.getElementById("prog-fill");
+        const hudPct = document.getElementById("hud-pct");
+        const sceneName = document.getElementById("scene-name");
+        const dots = document.querySelectorAll(".scene-dot");
+        const mobileStrip = document.getElementById("mobile-scene-strip");
+        let mobileDots = [];
+
+        // 创建移动端dots
+        function createMobileDots() {
+          if (!mobileStrip) return;
+          mobileStrip.innerHTML = "";
+          for (let i = 0; i < N_SCENES; i++) {
+            const dot = document.createElement("div");
+            dot.className = "mobile-dot";
+            dot.dataset.scene = i;
+            dot.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const targetSec = document.getElementById(`s${i}`);
+              if (targetSec) smoothScrollTo(targetSec.offsetTop, 700);
+            });
+            mobileStrip.appendChild(dot);
+            mobileDots.push(dot);
+          }
+        }
+        createMobileDots();
+
+        function updateHUD(s) {
+          const p = Math.round(s * 100);
+          const si = Math.min(N_SCENES - 1, Math.floor(s * N_SCENES));
+          if (hudPct) hudPct.textContent = String(p).padStart(3, "0") + "%";
+          if (progFill) progFill.style.width = `${p}%`;
+          if (sceneName) sceneName.textContent = NAMES[si];
+          dots.forEach((d, i) => d.classList.toggle("active", i === si));
+          mobileDots.forEach((d, i) => d.classList.toggle("active", i === si));
+        }
+
+        function refreshMaxScroll() {
+          maxScroll = Math.max(
+            1,
+            document.documentElement.scrollHeight - window.innerHeight,
+          );
+          tgt = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        }
+
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (maxScroll > 0) tgt = window.scrollY / maxScroll;
+            // 用户滚动时中断自定义动画
+            if (activeScrollAnim) {
+              cancelAnimationFrame(activeScrollAnim);
+              activeScrollAnim = null;
+            }
+          },
+          { passive: true },
+        );
+
+        window.addEventListener("resize", () => {
+          refreshMaxScroll();
+          resizeCanvas();
+        });
+
+        let resizeRAF = null;
+        let qualityScale = 1.0;
+        const MAX_DPR = 1.5,
+          MIN_QUALITY = 0.82,
+          MAX_QUALITY = 1.0;
+        const resizeCanvas = () => {
+          if (resizeRAF) cancelAnimationFrame(resizeRAF);
+          resizeRAF = requestAnimationFrame(() => {
+            const vp = window.visualViewport ?? {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            };
+            const cssW = Math.round(vp.width);
+            const cssH = Math.round(vp.height);
+            if (!cssW || !cssH) return;
+            const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+            const renderScale = dpr * qualityScale;
+            const pixelW = Math.max(1, Math.round(cssW * renderScale));
+            const pixelH = Math.max(1, Math.round(cssH * renderScale));
+            if (canvas.width !== pixelW || canvas.height !== pixelH) {
+              canvas.width = pixelW;
+              canvas.height = pixelH;
+              canvas.style.width = `${cssW}px`;
+              canvas.style.height = `${cssH}px`;
+              gl.viewport(0, 0, pixelW, pixelH);
+              gl.uniform2f(uR, pixelW, pixelH);
+            }
+            refreshMaxScroll();
+            resizeRAF = null;
+          });
+        };
+
+        // 帧率调节质量
+        let frameTimes = [];
+        let lastFrameTime = performance.now();
+        function adjustQuality(now) {
+          const dt = Math.min(0.033, (now - lastFrameTime) * 0.001);
+          lastFrameTime = now;
+          frameTimes.push(dt);
+          if (frameTimes.length > 30) frameTimes.shift();
+          if (frameTimes.length === 30) {
+            const avgDt = frameTimes.reduce((a, b) => a + b, 0) / 30;
+            const fps = 1 / avgDt;
+            if (fps < 50 && qualityScale > MIN_QUALITY) {
+              qualityScale = Math.max(MIN_QUALITY, qualityScale - 0.04);
+              resizeCanvas();
+            } else if (fps > 57 && qualityScale < MAX_QUALITY) {
+              qualityScale = Math.min(MAX_QUALITY, qualityScale + 0.02);
+              resizeCanvas();
+            }
+          }
+        }
+
+        // 平滑滚动动画
+        let activeScrollAnim = null;
+        function smoothScrollTo(targetY, duration = 800) {
+          if (activeScrollAnim) cancelAnimationFrame(activeScrollAnim);
+          const startY = window.scrollY;
+          const diff = targetY - startY;
+          const startTime = performance.now();
+          const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+          function step(now) {
+            const elapsed = now - startTime;
+            const p = Math.min(1, elapsed / duration);
+            window.scrollTo(0, startY + diff * easeOutCubic(p));
+            if (p < 1) activeScrollAnim = requestAnimationFrame(step);
+            else activeScrollAnim = null;
+          }
+          activeScrollAnim = requestAnimationFrame(step);
+        }
+
+        // 锚点点击拦截
+        document.querySelectorAll('a[href^="#s"]').forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute("href");
+            const target = document.querySelector(targetId);
+            if (target) smoothScrollTo(target.offsetTop, 750);
+          });
+        });
+        dots.forEach((dot, idx) => {
+          dot.addEventListener("click", () => {
+            const targetSec = document.getElementById(`s${idx}`);
+            if (targetSec) smoothScrollTo(targetSec.offsetTop, 700);
+          });
+        });
+
+        // 可见性API暂停动画
+        let visibilityPaused = false;
+        document.addEventListener("visibilitychange", () => {
+          visibilityPaused = document.hidden;
+        });
+
+        // 文字入场观察器
+        const revealEls = document.querySelectorAll(
+          ".tag, h1, h2, .body-text, .stat-row, .cta, .h-line",
+        );
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: "0px 0px -6% 0px" },
+        );
+        revealEls.forEach((el) => io.observe(el));
+
+        // 渲染循环
+        const t0 = performance.now();
+        let lastRender = t0;
+        function frame(now) {
+          requestAnimationFrame(frame);
+          if (visibilityPaused) return;
+          const dt = Math.min(0.033, (now - lastRender) * 0.001);
+          lastRender = now;
+          adjustQuality(now);
+          // 平滑跟随滚动位置
+          smooth += (tgt - smooth) * (1 - Math.exp(-dt * 8));
+          const raw = smooth * (N_SCENES - 1);
+          const flr = Math.floor(raw);
+          const si = Math.min(flr, N_SCENES - 2);
+          const bl = flr >= N_SCENES - 1 ? 1.0 : raw - flr;
+          updateHUD(smooth);
+          gl.uniform1f(uTi, (now - t0) / 1000);
+          gl.uniform1f(uScroll, smooth);
+          gl.uniform1f(uScene, si);
+          gl.uniform1f(uBlend, bl);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        }
+        requestAnimationFrame(frame);
+
+        // WebGL上下文丢失恢复
+        canvas.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault();
+          console.warn("WebGL context lost");
+          visibilityPaused = true; // 暂停渲染
+        });
+        canvas.addEventListener("webglcontextrestored", () => {
+          console.log("WebGL context restored, reloading shaders");
+          location.reload(); // 简单粗暴，但保证资源完全重建
+        });
+
+        // 初始化
+        resizeCanvas();
+        refreshMaxScroll();
+        // 确保移动端点样式同步
+        updateHUD(0);
+      })();
+    </script>
+  </body>
 </html>
