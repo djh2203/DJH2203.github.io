@@ -460,7 +460,9 @@
       }
 
       .link-list a {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.56rem;
         text-decoration: none;
         color: var(--text);
         font-size: 0.95rem;
@@ -475,6 +477,15 @@
           border-color 0.18s ease;
         position: relative;
         overflow: hidden;
+      }
+
+      .link-favicon {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.15);
       }
 
       .link-list a::after {
@@ -1000,9 +1011,34 @@
         const renderedLinks = Array.from(
           shell.querySelectorAll(".link-list a[href]"),
         );
+
+        function getFaviconUrl(url) {
+          try {
+            const u = new URL(url);
+            const host = u.hostname;
+            if (!host) return null;
+            return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+          } catch {
+            return null;
+          }
+        }
+
         for (const a of renderedLinks) {
           if (a.getAttribute("target") === "_blank") {
             a.setAttribute("rel", "noopener noreferrer");
+          }
+
+          const favicon = getFaviconUrl(a.href);
+          if (favicon) {
+            const img = document.createElement("img");
+            img.className = "link-favicon";
+            img.src = favicon;
+            img.alt = "";
+            img.loading = "lazy";
+            img.onerror = () => {
+              img.style.display = "none";
+            };
+            a.prepend(img);
           }
         }
 
@@ -1110,7 +1146,7 @@
           saveCache(cache);
         }
 
-        markDeadLinks();
+        // Disabled: cross-site link health checks trigger noisy fetch errors in some browsers/extensions.
       })();
     </script>
   </body>
