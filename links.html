@@ -1,308 +1,730 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>网站工具</title>
     <style>
+      :root {
+        --bg-0: #05070f;
+        --bg-1: #0b1120;
+        --bg-2: #111a2d;
+        --text: #f3f6ff;
+        --text-sub: #b8c2da;
+        --accent: #74f0d3;
+        --accent-2: #75a8ff;
+        --card: rgba(11, 17, 32, 0.72);
+        --card-border: rgba(255, 255, 255, 0.16);
+        --link-bg: rgba(116, 240, 211, 0.1);
+        --link-hover: rgba(117, 168, 255, 0.22);
+        --shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(90rem 55rem at 15% -10%, #1d2f57 0%, transparent 55%),
+          radial-gradient(90rem 55rem at 85% 0%, #1a3f4f 0%, transparent 55%),
+          linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+        background-size:
+          140% 140%,
+          140% 140%,
+          180% 180%;
+        background-attachment: fixed;
+        animation: bgFlow 2s ease-in-out infinite alternate;
+        padding: 2.5rem 1rem 3rem;
+        position: relative;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        width: 36rem;
+        height: 36rem;
+        border-radius: 50%;
+        filter: blur(110px);
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.24;
+      }
+
+      body::before {
+        left: -14rem;
+        top: -12rem;
+        background:
+          radial-gradient(
+            circle at 28% 28%,
+            rgba(168, 85, 247, 0.98) 0 13%,
+            rgba(168, 85, 247, 0.28) 25%,
+            transparent 52%
+          ),
+          radial-gradient(
+            circle at 72% 36%,
+            rgba(139, 92, 246, 0.82) 0 18%,
+            rgba(139, 92, 246, 0.2) 34%,
+            transparent 62%
+          ),
+          radial-gradient(
+            circle at 48% 74%,
+            rgba(236, 72, 153, 0.76) 0 20%,
+            rgba(236, 72, 153, 0.18) 38%,
+            transparent 64%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(88, 28, 135, 0.88) 0,
+            rgba(88, 28, 135, 0.28) 44%,
+            transparent 74%
+          );
+        background-size:
+          150% 150%,
+          165% 165%,
+          155% 155%,
+          140% 140%;
+        background-position:
+          0% 0%,
+          100% 18%,
+          30% 100%,
+          50% 50%;
+        animation: orbDriftA 14s ease-in-out infinite alternate;
+      }
+
+      body::after {
+        right: -12rem;
+        bottom: -16rem;
+        background:
+          radial-gradient(
+            circle at 34% 26%,
+            rgba(20, 184, 166, 0.98) 0 12%,
+            rgba(20, 184, 166, 0.26) 24%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 70% 40%,
+            rgba(16, 185, 129, 0.76) 0 18%,
+            rgba(16, 185, 129, 0.18) 33%,
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 42% 76%,
+            rgba(249, 115, 22, 0.72) 0 20%,
+            rgba(249, 115, 22, 0.16) 36%,
+            transparent 65%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(6, 95, 70, 0.86) 0,
+            rgba(6, 95, 70, 0.26) 44%,
+            transparent 75%
+          );
+        background-size:
+          150% 150%,
+          165% 165%,
+          155% 155%,
+          140% 140%;
+        background-position:
+          100% 0%,
+          0% 30%,
+          72% 100%,
+          50% 50%;
+        animation: orbDriftB 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes bgFlow {
+        0% {
+          background-position:
+            14% 0%,
+            86% 0%,
+            0% 0%;
+        }
+        50% {
+          background-position:
+            20% 12%,
+            78% 16%,
+            45% 40%;
+        }
+        100% {
+          background-position:
+            10% 24%,
+            90% 8%,
+            100% 100%;
+        }
+      }
+
+      @keyframes orbDriftA {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+          background-position:
+            0% 0%,
+            100% 18%,
+            30% 100%,
+            50% 50%;
+        }
+        50% {
+          transform: translate3d(0.6rem, 4.5rem, 0) scale(1.05);
+          background-position:
+            36% 22%,
+            72% 60%,
+            58% 72%,
+            54% 44%;
+        }
+        100% {
+          transform: translate3d(1.2rem, 9rem, 0) scale(1.1);
+          background-position:
+            82% 48%,
+            24% 100%,
+            100% 26%,
+            46% 56%;
+        }
+      }
+
+      @keyframes orbDriftB {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+          background-position:
+            100% 0%,
+            0% 30%,
+            72% 100%,
+            50% 50%;
+        }
+        50% {
+          transform: translate3d(-0.7rem, -4.8rem, 0) scale(1.06);
+          background-position:
+            62% 18%,
+            36% 72%,
+            26% 58%,
+            56% 46%;
+        }
+        100% {
+          transform: translate3d(-1.4rem, -9.5rem, 0) scale(1.12);
+          background-position:
+            12% 42%,
+            100% 100%,
+            0% 24%,
+            44% 56%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body,
+        body::before,
+        body::after {
+          animation: none !important;
+        }
+      }
+
+      .site-shell {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 2.5rem 1rem 2rem;
+        margin-bottom: 1.4rem;
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        background: linear-gradient(
+          140deg,
+          rgba(255, 255, 255, 0.07),
+          rgba(255, 255, 255, 0.02)
+        );
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -20% -80% -20%;
+        height: 13rem;
+        background: radial-gradient(
+          closest-side,
+          rgba(116, 240, 211, 0.2),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 4.8vw, 3.4rem);
+        letter-spacing: 0.08em;
+      }
+
+      .hero p {
+        margin-top: 0.9rem;
+        color: var(--text-sub);
+        font-size: clamp(0.95rem, 2vw, 1.08rem);
+        letter-spacing: 0.04em;
+      }
+
+      .top-controls {
+        display: grid;
+        gap: 0.75rem;
+        margin: 0 0 1rem;
+        padding: 0.9rem;
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        background: rgba(8, 14, 27, 0.65);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .search-wrap {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        flex: 1 1 16rem;
+        min-width: 12rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border-radius: 10px;
+        height: 2.35rem;
+        padding: 0 0.8rem;
+        outline: none;
+      }
+
+      .search-box:focus {
+        border-color: rgba(117, 168, 255, 0.8);
+        box-shadow: 0 0 0 2px rgba(117, 168, 255, 0.18);
+      }
+
+      .count-pill {
+        font-size: 0.78rem;
+        color: var(--text-sub);
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .chip-wrap {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-chip {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-sub);
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        border-radius: 999px;
+        padding: 0.34rem 0.62rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter-chip:hover {
+        color: var(--text);
+        border-color: rgba(116, 240, 211, 0.65);
+      }
+
+      .filter-chip.active {
+        color: #06131b;
+        background: linear-gradient(120deg, #74f0d3, #75a8ff);
+        border-color: transparent;
+        font-weight: 600;
+      }
+
+      .section-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+      }
+
+      .section-card {
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        background: var(--card);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition:
+          transform 0.22s ease,
+          border-color 0.22s ease,
+          box-shadow 0.22s ease;
+      }
+
+      .section-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(116, 240, 211, 0.55);
+        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
+      }
+
+      .section-card.is-hidden {
+        display: none;
+      }
+
+      .section-head {
+        padding: 1.1rem 1.1rem 0.85rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(
+          90deg,
+          rgba(116, 240, 211, 0.12),
+          rgba(117, 168, 255, 0.08)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.6rem;
+      }
+
+      .section-head h2 {
+        font-size: 1.06rem;
+        font-weight: 650;
+        letter-spacing: 0.06em;
+      }
+
+      .section-head .sub {
+        margin-top: 0.35rem;
+        color: var(--text-sub);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .head-left {
+        min-width: 0;
+      }
+
+      .head-count {
+        flex: 0 0 auto;
+        font-size: 0.74rem;
+        color: var(--text-sub);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        padding: 0.26rem 0.52rem;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .link-list {
+        list-style: none;
+        padding: 0.85rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+      }
+
+      .link-list.scrollable {
+        /* 11个链接可见，其余在卡片内滚动 */
+        max-height: calc(11 * 3.15rem);
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(117, 168, 255, 0.7) rgba(255, 255, 255, 0.08);
+      }
+
+      .link-list.scrollable::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .link-list.scrollable::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+      }
+
+      .link-list.scrollable::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          180deg,
+          rgba(116, 240, 211, 0.9),
+          rgba(117, 168, 255, 0.9)
+        );
+        border-radius: 999px;
+      }
+
+      .link-list a {
+        display: block;
+        text-decoration: none;
+        color: var(--text);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        padding: 0.72rem 0.78rem;
+        border-radius: 11px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        background: var(--link-bg);
+        transition:
+          transform 0.18s ease,
+          background-color 0.18s ease,
+          border-color 0.18s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .link-list a::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.18),
+          transparent
+        );
+        transform: translateX(-120%);
+        transition: transform 0.45s ease;
+        pointer-events: none;
+      }
+
+      .link-list a:hover {
+        transform: translateY(-2px);
+        background: var(--link-hover);
+        border-color: rgba(117, 168, 255, 0.62);
+        color: #ffffff;
+      }
+
+      .link-list a:hover::after {
+        transform: translateX(120%);
+      }
+
+      .link-list a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        background: var(--link-hover);
+        border-color: rgba(117, 168, 255, 0.62);
+      }
+
+      .link-list a:active {
+        transform: translateY(0);
+      }
+
+      .link-list a.link-dead {
+        background: rgba(255, 64, 64, 0.18) !important;
+        border-color: rgba(255, 82, 82, 0.7) !important;
+        color: #ffd3d3 !important;
+        box-shadow: inset 0 0 0 1px rgba(255, 92, 92, 0.35);
+      }
+
+      .site-footer {
+        margin-top: 1.4rem;
+        text-align: center;
+        color: var(--text-sub);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 0.9rem;
+        letter-spacing: 0.04em;
+      }
+
+      body > h1,
+      body > h2,
+      body > .english,
+      body > div[align="center"] {
+        display: none !important;
+      }
+
+      @media (max-width: 640px) {
         body {
-            background-color: rgb(0, 0, 0);
-            background-position: center top;
-            background-repeat: no-repeat;
-            background-size: 100%;
-            padding: 0px !important;
-            margin: 0px !important;
-            background-image: url(https://art.pixilart.com/sr2ed3625c62684.png);
-            background-size: 100%;
-            background-repeat: repeat-y;
-            text-align: center;
-
+          padding: 1rem 0.68rem 1.4rem;
         }
 
-        a {
-            /* 所有超链接标签 */
-            display: block;
-            text-decoration: none;
-            color: #fff8f8;
-            text-align: center;
-            background-color: rgb(53, 176, 171, 0.1);
-            width: 70%;
-            height: 70px;
-            font-size: 25px;
-            line-height: 70px;
+        .hero {
+          border-radius: 16px;
+          padding: 1.4rem 0.7rem 1.25rem;
         }
 
-        h1 {
-            /* 所有标题 */
-            font-size: 50px;
-            line-height: 50px;
-            color: #fff8f8;
-
+        .section-grid {
+          grid-template-columns: 1fr;
         }
 
-        h2 {
-            background-color: rgb(255, 248, 248, 0.1);
-            text-align: center;
+        .top-controls {
+          padding: 0.72rem;
         }
-
-        a:hover {
-            /* 所有鼠标位于其上的超链接标签 */
-            background-color: rgb(40, 102, 171, 0.4);
-            color: aqua;
-        }
-
-        a:active {
-            /* 所有未弹起的标签 */
-            background-color: rgb(105, 167, 148, 0.5);
-            color: rgb(29, 198, 198)
-        }
-
-        .english {
-            color: rgb(255, 255, 255);
-            text-align: center;
-            font-size: 30px;
-            font-weight: 300;
-        }
-
-        .fenge {
-            display: inline-block;
-            width: 100%;
-            margin: 0px;
-            text-align: center;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
-
+  <body>
     <h1 align="center">网站导航</h1>
     <h1 class="english">Site Navigation</h1>
     <div align="center">
-        <a href="https://www.ywyj.cn/" target="_blank">一网一匠</a>
-        <a href="https://xinquji.com/" target="_blank">新趣集</a>
-        <a href="https://fuun.fun/" target="_blank">Fuun</a>
-        <a href="https://www.xiaozhongjishu.com/?utm_source=xinquji" target="_blank">小众技术</a>
-        <a href="https://www.tboxn.com/" target="_blank">Tbox</a>
-        <a href="https://www.9bdh.com/" target="_blank">久伴导航</a>
-        <a href="https://nwuzmed.ga/" target="_blank">DAC导航</a>
-        <a href="https://www.kulayu.com/" target="_blank">酷啦鱼导航</a>
-        <a href="https://www.xue8nav.com/" target="_blank">学吧导航</a>
-        <a href="https://www.bqrdh.com/" target="_blank">不求人导航</a>
-        <a href="https://www.shandiandh.com/" target="_blank">闪电导航</a>
-        <a href="https://www.zjnav.com/" target="_blank">终极导航</a>
-        <a href="https://www.youjuji.com/" target="_blank">优聚集</a>
-        <a href="https://www.moeli123.com/" target="_blank">萌璃次元</a>
-        <a href="https://www.ecy.cn/" target="_blank">E站导航</a>
-        <a href="http://www.soutushenqi.com/siteNavigation/" target="_blank">搜图神器</a>
-        <a href="https://lanrenao.com/bulletin/112.html" target="_blank">懒人导航</a>
-        <a href="http://www.hepou.com/" target="_blank">禾坡导航</a>
-        <a href="https://www.mjjloc.com/" target="_blank">MJJ导航</a>
-        <a href="https://www.hifast.cn/" target="_blank">快导航网</a>
-        <a href="https://shadiao.pro/" target="_blank">沙雕导航</a>
-        <a href="https://www.9ghao.com/" target="_blank">9G导航</a>
-        <a href="https://nav.guidebook.top/" target="_blank">数字导航</a>
-        <a href="https://www.xuezha.cn" target="_blank">学渣导航</a>
-        <a href="https://anee.cc/?a.cool=friends" target="_blank">安逸导航</a>
-        <a href="https://www.12k.net/" target="_blank">12K导航</a>
-        <a href="https://wanyouw.com/" target="_blank">万有导航</a>
-        <a href="https://www.a.cool/" target="_blank">啊酷导航</a>
-        <a href="https://creatorsdaily.com/" target="_blank">创造者日报</a>
-        <a href="https://it-cxy.top//" target="_blank">我的书签</a>
-        <a href="http://guozhivip.com/" target="_blank">果汁导航</a>
-        <a href="https://fxsh.com/" target="_blank">番喜导航</a>
-        <a href="https://yangwang.ltd/" target="_blank">蜗牛导航</a>
-        <a href="https://www.wangzhank.net/" target="_blank">醉长生导航</a>
-        <a href="https://box.misiai.com/#/" target="_blank">无道导航</a>
-        <a href="https://www.nbwz.com/" target="_blank">牛逼导航</a>
-        <a href="http://aleikeji.com/" target="_blank">阿雷导航</a>
-        <a href="https://search.chongbuluo.com/" target="_blank">虫部落导航</a>
-        <a href="https://imyshare.com/navigation/" target="_blank">Imyshare导航</a>
-        <a href="https://andrewjr.wang/" target="_blank">静然导航</a>
-        <a href="https://baozangku.com/" target="_blank">哆啦A梦导航</a>
-        <a href="https://www.pkzhidi.xyz/" target="_blank">皮卡导航</a>
-        <a href="https://www.lengcat.cn/" target="_blank">冷猫导航</a>
-        <a href="https://v-li.com/" target="_blank">馨宁导航</a><br>
+      <a href="https://xinquji.com/" target="_blank">新趣集</a>
+      <a href="https://fuun.fun/" target="_blank">Fuun</a>
+      <a href="https://www.tboxn.com/" target="_blank">Tbox</a>
+
+      <a href="https://lkssite.vip/" target="_blank">LKs Site</a>
+      <a href="https://www.xue8nav.com/" target="_blank">学吧导航</a>
+      <a href="https://www.bqrdh.com/" target="_blank">不求人导航</a>
+      <a href="https://www.zjnav.com/" target="_blank">终极导航</a>
+      <a href="https://www.a.cool/" target="_blank">啊酷导航</a>
+      <a href="http://guozhivip.com/" target="_blank">果汁导航</a>
+      <a href="https://search.chongbuluo.com/" target="_blank">虫部落导航</a>
+      <a href="https://www.lengcat.cn/" target="_blank">冷猫导航</a><br />
     </div>
 
     <h1 align="center">在线工具箱</h1>
     <h1 class="english">Online Toolbox</h1>
     <div align="center">
-        <a href="https://www.retiehe.com/" target="_blank">热铁盒</a>
-        <a href="http://www.atoolbox.net/" target="_blank">一个工具箱</a>
-        <a href="https://www.67tool.com/" target="_blank">即时工具</a>
-        <a href="https://c.p2hp.com/?ref=www.lengcat.cn" target="_blank">高手工具</a>
-        <a href="https://1024tools.com/?ref=www.lengcat.cn" target="_blank">1024程序员开发工具</a>
-        <a href="http://www.woniu6.cn/" target="_blank">蜗牛工具箱</a>
-        <a href="https://www.xyjwangluo.cn/" target="_blank">小妖精工具箱</a>
-        <a href="https://zxxgj.net/" target="_blank">在线小工具</a>
-        <a href="https://tool.lu/" target="_blank">在线工具</a>
-        <a href="https://c.runoob.com/" target="_blank">菜鸟工具</a>
-        <a href="https://www.shulijp.com/index.html" target="_blank">云间工具</a>
-        <a href="http://tool.mkblog.cn/" target="_blank">孟坤工具</a>
-        <a href="https://www.qijishow.com/down/index.html" target="_blank">奇迹秀工具</a>
-        <a href="https://www.zxgj.cn/" target="_blank">在线工具</a>
-        <a href="https://www.iamwawa.cn/" target="_blank">蛙蛙工具</a>
-        <a href="https://zxso.net/" target="_blank">风雪工具</a>
-        <a href="https://moyu.games/" target="_blank">摸鱼工具</a>
-        <a href="https://pranx.com/" target="_blank">恶搞网站</a>
-        <a href="https://freesms.vip/" target="_blank">免费电话</a>
-        <a href="https://www.aconvert.com/cn/" target="_blank">文件转化1</a>
-        <a href="https://www.alltoall.net/" target="_blank">文件转化2</a>
-        <a href="https://lkssite.vip/" target="_blank">LKs Site</a>
-        <a href="https://www.toolnb.com/" target="_blank">爱资料工具</a>
-        <a href="https://jingzhunyun.com/" target="_blank">精准云工具</a>
-        <a href="https://tiomg.org/" target="_blank">太美工具</a>
-        <a href="https://www.lmcjl.com/" target="_blank">lmcjl工具</a>
-        <a href="http://www.gjw123.com/" target="_blank">123工具</a>
-        <a href="http://tool.ycyuan.cn/" target="_blank">异次元工具</a>
-        <a href="https://www.amp360.net/" target="_blank">兔2工具</a>
-        <a href="https://tools.kalvinbg.cn/" target="_blank">Kalvin工具</a>
-        <a href="https://toolwa.com/" target="_blank">工具哇</a><br>
+      <a href="https://lingdaima.com/file/" target="_blank">在线快传</a>
+      <a href="https://transfer.zip/" target="_blank">文件传输</a>
+      <a href="https://www.retiehe.com/" target="_blank">热铁盒</a>
+      <a href="https://www.67tool.com/" target="_blank">即时工具</a>
+      <a href="https://tool.lu/" target="_blank">在线工具</a>
+      <a href="https://freesms.vip/" target="_blank">免费电话</a>
+      <a href="https://www.alltoall.net/" target="_blank">文件转化</a>
+      <a href="https://toolwa.com/" target="_blank">工具哇</a><br />
     </div>
 
-    
     <h1 align="center">人工智能</h1>
     <h1 class="english">ai</h1>
     <div align="center">
-        <a href="https://chat-shared2.zhile.io/" target="_blank">chatgpt</a>
-        <a href="https://chuchen.aust001.com/GPT4/" target="_blank">chatgpt4 小海疼</a>
-        <a href="https://aust001.pythonanywhere.com/" target="_blank">GPT4网页导航</a>
-        <a href="https://www.ainav.cn/" target="_blank">ai导航</a>
-        <a href="https://mindshow.fun/" target="_blank">aiPPT</a>
-        <a href="https://qianwen.aliyun.com/" target="_blank">通义千问</a>
-        <a href="https://wanxiang.aliyun.com/" target="_blank">通义万象</a>
-        <a href="https://tingwu.aliyun.com/" target="_blank">通义听悟</a>
-        <a href="https://studio.d-id.com/" target="_blank">人物视频</a>
-        <a href="https://app.runwayml.com/video-tools/teams/djh2203/dashboard" target="_blank">ai视频</a>
-        <a href="https://www.liandanjia.com/" target="_blank">炼丹家ai</a><br>
+      <a href="https://chatgpt.com/" target="_blank">chatgpt</a>
+      <a href="https://github.com/copilot" target="_blank">copilot</a>
+      <a href="https://chat.deepseek.com/" target="_blank">deepseek</a>
+      <a href="https://yuanbao.tencent.com/chat/" target="_blank">元宝</a>
+      <a href="https://www.tripo3d.ai/app" target="_blank">tripo3d</a>
+      <a href="https://login.bce.baidu.com/" target="_blank">百度智能云</a>
+      <a href="https://console.volcengine.com/" target="_blank">火山引擎</a>
+      <a
+        href="https://modelscope.cn/models/microsoft/Phi-3-mini-4k-instruct-gguf/files"
+        target="_blank"
+        >ModelScope - Phi-3 模型文件</a
+      >
+      <a href="https://tools.dayun.cool/manbo" target="_blank"
+        >曼波配音生成器</a
+      >
+      <a href="https://bananaslides.online/" target="_blank">蕉幻</a><br />
     </div>
 
-
-
-
-    <h1 align="center">资源网站</h1>
+    <h1 align="center">素材网站</h1>
     <h1 class="english">Resource Website</h1>
     <div align="center">
-        <a href="https://www.iconfont.cn/" target="_blank">阿里巴巴图标矢量库</a>
-        <a href="https://www.shareicon.net/" target="_blank">icon</a>
-        <a href="https://www.aigei.com/" target="_blank">爱给_元素库</a>
-        <a href="https://www.skypixel.com/" target="_blank">背景_天空之城</a>
-        <a href="https://500px.com.cn/" target="_blank">背景_500px</a>
-        <a href="https://www.pixilart.com/" target="_blank">像素画</a>
-        <a href="http://bbs.bathome.net/" target="_blank">批处理之家</a>
-        <a href="https://www.iiice.cn/?utm_source=xinquji#/" target="_blank">下次一定</a>
-        <a href="https://resn.co.nz/#!/work/all" target="_blank">壁纸网站</a>
-        <a href="https://www.91sotu.com/" target="_blank">搜图导航</a>
-        <a href="http://www.soutushenqi.com/siteNavigation/" target="_blank">搜图神器</a><br>
-
+      <a href="https://www.iconfont.cn/" target="_blank">阿里巴巴图标矢量库</a>
+      <a href="https://www.shareicon.net/" target="_blank">shareicon</a>
+      <a href="https://www.aigei.com/" target="_blank">爱给_元素库</a>
+      <a href="https://www.skypixel.com/" target="_blank">背景_天空之城</a>
+      <a href="https://500px.com.cn/" target="_blank">背景_500px</a>
+      <a href="https://www.pixilart.com/" target="_blank">像素画</a>
+      <a href="https://www.iiice.cn/?utm_source=xinquji#/" target="_blank"
+        >下次一定</a
+      >
+      <a href="https://www.91sotu.com/" target="_blank">搜图导航</a><br />
     </div>
 
     <h1 align="center">素材设计</h1>
     <h1 class="english">Apparel Material Design</h1>
     <div align="center">
-        <a href="https://c.runoob.com/more/colorpad/tradcnc.html" target="_blank">颜色搭配</a>
-        <a href="http://zhongguose.com/#yalv" target="_blank">中国色</a>
-        <a href="http://color.oulu.me/" target="_blank">渐变色1</a>
-        <a href="https://uigradients.com/#Candy" target="_blank">渐变色2</a>
-        <a href="https://www.67tool.com/images/zoom" target="_blank">图片调整大小</a>
-        <a href="https://c.runoob.com/front-end/7433/" target="_blank">代码生成图片</a>
-        <a href="https://imgloc.com/" target="_blank">直链图床</a>
-        <a href="https://bgsub.cn/?utm_source=xinquji" target="_blank">在线抠图</a>
-        <a href="https://www.photopea.com/" target="_blank">在线ps </a>
-        <a href="https://photofunia.com/cn/" target="_blank">photofunia</a>
-        <a href="http://www.ihaoge.net/tool/song/" target="_blank">直链音乐</a>
-        <a href="https://123apps.com/cn/" target="_blank">视频剪辑导航</a>
-        <a href="https://hao.uisdc.com/" target="_blank">设计师导航</a><br>
+      <a href="http://zhongguose.com/#yalv" target="_blank">中国色</a>
+      <a href="http://color.oulu.me/" target="_blank">渐变色1</a>
+      <a href="https://uigradients.com/#Candy" target="_blank">渐变色2</a>
+      <a href="https://www.67tool.com/images/zoom" target="_blank"
+        >图片调整大小</a
+      >
+      <a href="https://c.runoob.com/front-end/7433/" target="_blank"
+        >代码生成图片</a
+      >
+      <a href="https://imgloc.com/" target="_blank">直链图床</a>
+      <a href="https://www.photopea.com/" target="_blank">在线ps </a>
+      <a href="https://photofunia.com/cn/" target="_blank">photofunia</a>
+      <a href="https://123apps.com/cn/" target="_blank">视频剪辑导航</a>
+      <a href="https://hao.uisdc.com/" target="_blank">优设</a><br />
     </div>
 
     <h1 align="center">前端开发</h1>
     <h1 class="english">Website Design</h1>
     <div align="center">
-        <a href="https://transfer.zip/" target="_blank">文件传输</a>
-        <a href="https://tool.p2hp.com/" target="_blank">程序员工具</a>
-        <a href="http://code.ciaoca.com/" target="_blank">前端开发仓库</a>
-        <a href="https://c.runoob.com/front-end/7688/" target="_blank">表格生成器</a>
-        <a href="https://neumorphism.io/#e0e0e0" target="_blank">ui生成器</a>
-        <a href="https://enjoycss.com/" target="_blank">css生成器</a>
-        <a href="https://tableconvert.com/" target="_blank">表格生成器</a>
-        <a href="https://webjike.com/web.html" target="_blank">前端导航</a>
-        <a href="https://www.javascript.fun/" target="_blank">javascript代码库</a>
-        <a href="https://www.cxy521.com/" target="_blank">cxy521</a><br>
+      <a href="https://tool.p2hp.com/" target="_blank">程序员工具</a>
+      <a href="http://code.ciaoca.com/" target="_blank">前端开发仓库</a>
+      <a href="https://neumorphism.io/#e0e0e0" target="_blank">ui生成器</a>
+      <a href="https://enjoycss.com/" target="_blank">css生成器</a>
+      <a href="https://tableconvert.com/" target="_blank">表格转换器</a>
+      <a href="https://webjike.com/web.html" target="_blank">前端导航</a>
+      <a href="https://www.javascript.fun/" target="_blank">javascript代码库</a
+      ><br />
     </div>
 
     <h1 align="center">有趣网站</h1>
     <h1 class="english">Interesting Website</h1>
     <div align="center">
-        <a href="http://sojo.im/" target="_blank">逼死前端狗</a>
-        <a href="https://fakeupdate.net/" target="_blank">假装升级</a>
-        <a href="https://neal.fun/?utm_source=xinquji" target="_blank">小网站</a>
-        <a href="https://thisxdoesnotexist.com/" target="_blank">此X不存在</a>
-        <a href="https://wttr.in/" target="_blank">天气预报</a>
-        <a href="https://youquhome.com/?utm_source=xinquji" target="_blank">有趣网站之家</a><br>
+      <a href="https://youquhome.com/?utm_source=xinquji" target="_blank"
+        >有趣网站之家</a
+      >
+      <a href="https://fakeupdate.net/" target="_blank">假装升级</a>
+      <a href="https://neal.fun/?utm_source=xinquji" target="_blank"
+        >neal.fun</a
+      >
+      <a href="https://thisxdoesnotexist.com/" target="_blank">此X不存在</a
+      ><br />
     </div>
 
     <h1 align="center">其他网站</h1>
     <h1 class="english">Other Websites</h1>
     <div align="center">
-        <a href="https://matcha01.love/" target="_blank">抹茶</a>
-        <a href="https://www.runningcheese.com/" target="_blank">奔跑中的奶酪</a>
-        <a href="https://u9baoku.xyz/" target="_blank">悠久的小宝库</a>
-        <a href="https://www.zaihua.net/" target="_blank">在花博客</a>
-        <a href="http://www.ruanyifeng.com/" target="_blank">阮一峰的博客</a>
-        <a href="https://literature-clock.jenevoldsen.com/" target="_blank">文字时钟</a>
-        <a href="http://gogoame.sumbioun.com/" target="_blank">文字雨</a>
-        <a href="http://www.matcha01.love:261/" target="_blank">邮箱轰炸</a>
-        <a href="http://sovmusic.ru/" target="_blank">苏联音乐</a><br>
+      <a href="https://www.runningcheese.com/" target="_blank">奔跑中的奶酪</a>
+      <a href="http://www.ruanyifeng.com/" target="_blank">阮一峰的博客</a>
+      <a href="https://literature-clock.jenevoldsen.com/" target="_blank"
+        >文字时钟</a
+      >
+      <a href="http://gogoame.sumbioun.com/" target="_blank">文字雨</a>
+      <a href="http://sovmusic.ru/" target="_blank">苏联音乐</a><br />
     </div>
 
     <h1 align="center">随机api</h1>
     <h1 class="english">Random API</h1>
     <div align="center">
-        <a href="https://api.aa1.cn/" target="_blank">免费api</a>
-        <a href="https://api.btstu.cn/" target="_blank">搏天api</a>
-        <a href="https://api.isoyu.com/#/" target="_blank">姬长信</a>
-        <a href="https://www.showdoc.com.cn/" target="_blank">api文档</a>
-        <a href="https://v.api.aa1.cn/api/yiyan/index.php" target="_blank">随机一句话</a>
-        <a href="https://img.r10086.com/" target="_blank">樱道</a>
-        <a href="https://api.isoyu.com/ARU_GIF_S.php" target="_blank">表情包</a>
-        <a href="http://edgecats.net/" target="_blank">猫猫</a>
-        <a href="https://api.dujin.org/bing/1366.php" target="_blank">bing壁纸</a><br>
+      <a href="https://api.aa1.cn/" target="_blank">免费api</a>
+      <a href="https://api.btstu.cn/" target="_blank">搏天api</a>
+      <a href="https://api.isoyu.com/#/" target="_blank">姬长信</a>
+      <a href="https://v.api.aa1.cn/api/yiyan/index.php" target="_blank"
+        >随机一句话</a
+      >
+      <a href="https://api.isoyu.com/ARU_GIF_S.php" target="_blank">表情包</a>
+      <a href="http://edgecats.net/" target="_blank">猫猫</a>
+      <a href="https://api.dujin.org/bing/1366.php" target="_blank">bing壁纸</a
+      ><br />
     </div>
 
     <h1 align="center">笔记</h1>
     <h1 class="english">Note</h1>
     <div align="center">
-        <a href="https://docs.mphy.top/#/" target="_blank">MurphyChen's Notes</a>
-        <a href="https://www.zjgsuzjx.top/md/HTML.html" target="_blank">html</a>
-        <a href="https://www.zjgsuzjx.top/md/CSS.html" target="_blank">css</a>
-        <a href="https://learnlayout.com/" target="_blank">learn css</a>
-        <a href="https://flexboxfroggy.com/" target="_blank">flex</a>
-        <a href="https://www.zjgsuzjx.top/md/JavaScript.html" target="_blank">javascript</a>
-        <a href="https://www.zjgsuzjx.top/md/webpack.html" target="_blank">webpack</a>
-        <a href="https://www.zjgsuzjx.top/md/vue2.html" target="_blank">vue2</a><br>
-    </div>
-
+      <a href="https://docs.mphy.top/#/" target="_blank">MurphyChen's Notes</a>
+      <a href="https://learnlayout.com/" target="_blank">learn css</a>
+      <a href="https://flexboxfroggy.com/" target="_blank">flex</a><br />
     </div>
     <h1 align="center">系统</h1>
     <h1 class="english">Windows</h1>
     <div align="center">
-        <a href="https://share.acreson.cn/%E8%BD%AF%E4%BB%B6%E5%85%B1%E4%BA%AB%F0%9F%94%91/Windows/%E7%B3%BB%E7%BB%9F%E5%B7%A5%E5%85%B7/%E6%BF%80%E6%B4%BB%E5%B7%A5%E5%85%B7%E6%95%B4%E7%90%86" target="_blank">windows激活</a>
-        <a href="https://www.windows93.net/?utm_source=xinquji#!/c/?utm_source=xinquji" target="_blank">windows93</a>
-        <a href="https://win7simu.visnalize.com/" target="_blank">win7+win8+win10+win11</a>
-        <a href="http://myim.online/?utm_source=xinquji" target="_blank">win10</a>
-        <a href="https://win11.blueedge.me/" target="_blank">win11</a>
-        <a href="https://tjy-gitnub.github.io/win12/desktop.html" target="_blank">win12</a><br>
+      <a
+        href="https://www.windows93.net/?utm_source=xinquji#!/c/?utm_source=xinquji"
+        target="_blank"
+        >windows93</a
+      >
+      <a href="https://win7simu.visnalize.com/" target="_blank"
+        >win7+win8+win10+win11</a
+      >
+      <a href="https://vtron.site/" target="_blank">win10</a>
+      <a href="https://win11.blueedge.me/" target="_blank">win11</a>
+      <a href="https://tjy-gitnub.github.io/win12/desktop.html" target="_blank"
+        >win12</a
+      ><br />
     </div>
-
+    <!-- 
     <h1 align="center">我的世界</h1>
     <h1 class="english">Minecraft</h1>
     <div align="center">
@@ -316,33 +738,38 @@
         <a href="https://wzh656.github.io/MinecraftWeb/main.html" target="_blank">我的世界6_国人开源</a>
         <a href="https://gamejolt.net/?token=HHfEb9RFsjVQskTDJRXYG2VmBx7nie" target="_blank">我的世界7_Scratch</a>
         <a href="http://vapu.ga/" target="_blank">我的世界8_多人版</a><br>
-    </div>
-
+    </div> -->
+    <!-- 
     <h1 align="center">壁纸</h1>
     <h1 class="english">Wallpaper</h1>
     <div align="center">
         <a href="http://matcha01.eu3.org/" target="_blank">随机网站</a>
         <a href="https://ilove.works/" target="_blank">我爱工作</a><br>
-    </div>
+    </div> -->
 
     <h1 align="center">破解软件</h1>
     <h1 class="english">Cracked Software</h1>
     <div align="center">
-        <a href="http://foreve.ysepan.com/" target="_blank">单机游戏</a>
-        <a href="https://otp.landian.vip/zh-cn/" target="_blank">Office Tool Plus</a>
-        <a href="https://tmioe.com/windows" target="_blank">za杂货铺</a>
-        <a href="https://shimo.im/docs/CKTQ9vc6G8GkHgp3/read" target="_blank">木子淇</a>
-        <a href="https://www.wotianna.com/" target="_blank">我天哪</a>
-        <a href="https://www.wmzhe.com/" target="_blank">完美下载</a>
-        <a href="https://www.crxsoso.com/" target="_blank">应用、拓展商店</a>
-        <a href="https://pan.baidu.com/s/1Cwzl-mA6U9BAz08-vN60OQ?pwd=9999#list/path=%2F" target="_blank">adobe</a>
-        <a href="https://www.yuque.com/gaosuxiazai/oacb9y/rowuh2mvsbmty2yw" target="_blank">adobe全家桶</a>
-        <a href="https://www.afxw5.com/bdybxs" target="_blank">百度网盘破解</a>
-        <a href="https://positiverecords.ru/" target="_blank">俄罗斯破解photoshop</a>
-        <a href="https://www.waodown.com/" target="_blank">哇哦菌</a><br>
+      <a href="https://otp.landian.vip/zh-cn/" target="_blank"
+        >Office Tool Plus</a
+      >
+      <a href="https://tmioe.com/windows" target="_blank">za杂货铺</a>
+      <a href="https://www.wmzhe.com/" target="_blank">完美下载</a>
+      <a
+        href="https://pan.baidu.com/s/1Cwzl-mA6U9BAz08-vN60OQ?pwd=9999#list/path=%2F"
+        target="_blank"
+        >adobe</a
+      >
+      <a
+        href="https://www.yuque.com/gaosuxiazai/oacb9y/rowuh2mvsbmty2yw"
+        target="_blank"
+        >adobe全家桶</a
+      >
+      <a href="https://positiverecords.ru/" target="_blank">俄罗斯破解站</a>
+      <a href="https://www.waodown.com/" target="_blank">哇哦菌</a><br />
     </div>
 
-    <h1 align="center">学习资料</h1>
+    <!-- <h1 align="center">学习资料</h1>
     <h1 class="english">Sutdy！</h1>
     <div align="center">
         <a href="https://zscc2022.feishu.cn/docx/doxcncURov4xXRqHGaYnbc7kI1c" target="_blank">2022高一网课</a>
@@ -351,22 +778,340 @@
         <a href="https://zscc2022.feishu.cn/docx/doxcnJot4YGDptEZvDcj7OISN2g" target="_blank">2023高二网课</a>
         <a href="https://docs.qq.com/doc/DQW5aSEZmWHJIRUZS" target="_blank">2022高三网课</a>
         <a href="https://docs.qq.com/doc/DQUJEVE9vTmxlbndl" target="_blank">2023高三网课</a><br>
-    </div>
-
+    </div> -->
+    <!-- 
     <h1 align="center">病毒</h1>
     <h1 class="english"></h1>
     <div align="center">
         <a href="http://maorenjie147.ysepan.com/" target="_blank">毒多多</a><br>
     </div>
-    
-     <h1 align="center">游戏</h1>
-    <h1 class="english">Game</h1>
+     -->
+
+    <h1 align="center">游戏</h1>
+    <h1 class="english">Games</h1>
     <div align="center">
-        <a href="https://bytelegend.com/" target="_blank">bytelegend</a><br>
+      <a href="https://www.thewitcher.com/zh-cn/school-quiz" target="_blank"
+        >猎魔人学派测验</a
+      >
+      <a href="https://itch.io/" target="_blank">itch</a>
+      <a href="https://generals.io/" target="_blank">generals将军棋</a>
+      <a href="https://steamdb.info/" target="_blank">SteamDB</a>
+      <a
+        href="https://www.ea.com/zh-hant/games/battlefield/battlefield-2042/media-hub/battlefield-2042-screenshots"
+        target="_blank"
+        >《战地风云 2042》媒体页</a
+      >
     </div>
 
-    <h2>Copyright &copy 2023 by DJH</h2>
+    <h1 align="center">学习与编程</h1>
+    <h1 class="english">Study & Coding</h1>
+    <div align="center">
+      <a href="https://pintia.cn/problem-sets/dashboard" target="_blank"
+        >PTA 程序设计平台</a
+      >
+      <a href="https://csdiy.wiki/" target="_blank">CS 自学指南</a>
+      <a href="https://learngitbranching.js.org/?locale=zh_CN" target="_blank"
+        >Learn Git</a
+      >
+      <a href="https://www.dotcpp.com/oj/lanqiao/" target="_blank"
+        >蓝桥杯真题 - C语言网</a
+      >
+      <a href="https://hellogithub.com/article" target="_blank"
+        >HelloGitHub 文章</a
+      >
+      <a href="https://github.com/originalankur/maptoposter" target="_blank"
+        >MapToPoster</a
+      >
+    </div>
 
-</body>
+    <h2>Copyright &copy 2026 by DJH</h2>
 
+    <script>
+      (function () {
+        const bodyChildren = Array.from(document.body.children);
+        const shell = document.createElement("main");
+        shell.className = "site-shell";
+
+        const hero = document.createElement("header");
+        hero.className = "hero";
+        hero.innerHTML =
+          "<h1>网站导航集合</h1><p>DJH2203 · Links Collection</p>";
+        shell.appendChild(hero);
+
+        const controls = document.createElement("section");
+        controls.className = "top-controls";
+        controls.innerHTML =
+          "" +
+          "<div class='search-wrap'>" +
+          "  <input class='search-box' type='search' placeholder='搜索链接名称或域名...' aria-label='搜索链接'>" +
+          "  <span class='count-pill' id='visible-counter'>0 / 0</span>" +
+          "</div>" +
+          "<div class='chip-wrap' id='chip-wrap'></div>";
+        shell.appendChild(controls);
+
+        const grid = document.createElement("section");
+        grid.className = "section-grid";
+
+        for (let i = 0; i < bodyChildren.length; i++) {
+          const ch = bodyChildren[i];
+          if (ch.tagName !== "H1" || ch.classList.contains("english")) continue;
+          const title = ch.textContent.trim();
+          const english = bodyChildren[i + 1];
+          const linksWrap = bodyChildren[i + 2];
+
+          if (
+            !english ||
+            !linksWrap ||
+            english.tagName !== "H1" ||
+            !english.classList.contains("english")
+          )
+            continue;
+          if (linksWrap.tagName !== "DIV") continue;
+
+          const links = Array.from(linksWrap.querySelectorAll("a"));
+          if (!links.length) continue;
+
+          const card = document.createElement("article");
+          card.className = "section-card";
+          card.dataset.title = title.toLowerCase();
+
+          const head = document.createElement("div");
+          head.className = "section-head";
+          const sub = english.textContent.trim() || "Links";
+          const iconMap = {
+            网站导航: "🧭",
+            在线工具箱: "🧰",
+            人工智能: "🤖",
+            素材网站: "🎨",
+            素材设计: "🖌️",
+            前端开发: "💻",
+            有趣网站: "✨",
+            其他网站: "🌐",
+            随机api: "🔌",
+            笔记: "📝",
+            系统: "🪟",
+            破解软件: "📦",
+            游戏: "🎮",
+            学习与编程: "📚",
+          };
+          const icon = iconMap[title] || "📁";
+          head.innerHTML =
+            "" +
+            "<div class='head-left'><h2>" +
+            icon +
+            " " +
+            title +
+            "</h2><div class='sub'>" +
+            sub +
+            "</div></div>" +
+            "<span class='head-count'>" +
+            links.length +
+            "</span>";
+          card.appendChild(head);
+
+          const ul = document.createElement("ul");
+          ul.className = "link-list";
+          for (const a of links) {
+            const li = document.createElement("li");
+            li.appendChild(a);
+            ul.appendChild(li);
+          }
+          if (links.length > 11) {
+            ul.classList.add("scrollable");
+          }
+          card.appendChild(ul);
+          grid.appendChild(card);
+        }
+
+        shell.appendChild(grid);
+
+        const allCards = Array.from(grid.querySelectorAll(".section-card"));
+        const searchInput = controls.querySelector(".search-box");
+        const counter = controls.querySelector("#visible-counter");
+        const chipWrap = controls.querySelector("#chip-wrap");
+        let activeTag = "all";
+
+        function updateCounter() {
+          const visibleCards = allCards.filter(
+            (c) => !c.classList.contains("is-hidden"),
+          );
+          const visibleLinks = visibleCards.reduce(
+            (sum, c) => sum + c.querySelectorAll(".link-list a").length,
+            0,
+          );
+          const totalLinks = allCards.reduce(
+            (sum, c) => sum + c.querySelectorAll(".link-list a").length,
+            0,
+          );
+          counter.textContent = visibleLinks + " / " + totalLinks;
+        }
+
+        function applyFilter() {
+          const q = (searchInput.value || "").trim().toLowerCase();
+          for (const card of allCards) {
+            const tagOk =
+              activeTag === "all" || card.dataset.title === activeTag;
+            let matchCount = 0;
+            const anchors = Array.from(card.querySelectorAll(".link-list a"));
+            for (const a of anchors) {
+              const hay = (
+                (a.textContent || "") +
+                " " +
+                (a.href || "")
+              ).toLowerCase();
+              const ok = !q || hay.includes(q);
+              a.parentElement.style.display = ok ? "" : "none";
+              if (ok) matchCount++;
+            }
+            card.classList.toggle("is-hidden", !(tagOk && matchCount > 0));
+          }
+          updateCounter();
+        }
+
+        const categories = ["all"];
+        for (const c of allCards) categories.push(c.dataset.title);
+        const unique = Array.from(new Set(categories));
+        for (const tag of unique) {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "filter-chip" + (tag === "all" ? " active" : "");
+          chip.textContent = tag === "all" ? "全部" : tag;
+          chip.addEventListener("click", () => {
+            activeTag = tag;
+            Array.from(chipWrap.children).forEach((el) =>
+              el.classList.remove("active"),
+            );
+            chip.classList.add("active");
+            applyFilter();
+          });
+          chipWrap.appendChild(chip);
+        }
+
+        searchInput.addEventListener("input", applyFilter);
+        applyFilter();
+
+        const footer = document.createElement("footer");
+        footer.className = "site-footer";
+        footer.textContent = "Copyright © 2026 by DJH";
+        shell.appendChild(footer);
+
+        document.body.appendChild(shell);
+
+        const renderedLinks = Array.from(
+          shell.querySelectorAll(".link-list a[href]"),
+        );
+        for (const a of renderedLinks) {
+          if (a.getAttribute("target") === "_blank") {
+            a.setAttribute("rel", "noopener noreferrer");
+          }
+        }
+
+        const CACHE_KEY = "links_status_cache_v1";
+        const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+        const CHECK_TIMEOUT_MS = 6500;
+        const MAX_CONCURRENCY = 6;
+        const CHECK_SKIP_KEYWORDS = [
+          "console.",
+          "login.",
+          "auth",
+          "oauth",
+          "webvpn",
+          "signin",
+          "sso",
+          "account.",
+        ];
+
+        function loadCache() {
+          try {
+            const raw = localStorage.getItem(CACHE_KEY);
+            if (!raw) return {};
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === "object" ? parsed : {};
+          } catch {
+            return {};
+          }
+        }
+
+        function saveCache(cache) {
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+          } catch {
+            // 忽略存储失败（隐私模式或容量限制）
+          }
+        }
+
+        async function checkLinkLikelyAlive(url) {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
+          try {
+            await fetch(url, {
+              method: "GET",
+              mode: "no-cors",
+              cache: "no-store",
+              signal: controller.signal,
+            });
+            clearTimeout(timer);
+            return true;
+          } catch {
+            clearTimeout(timer);
+            return false;
+          }
+        }
+
+        async function runWithConcurrency(items, worker, limit) {
+          let index = 0;
+          const workers = Array.from(
+            { length: Math.min(limit, items.length) },
+            async () => {
+              while (index < items.length) {
+                const current = items[index++];
+                await worker(current);
+              }
+            },
+          );
+          await Promise.all(workers);
+        }
+
+        async function markDeadLinks() {
+          const anchors = Array.from(
+            grid.querySelectorAll(".link-list a[href]"),
+          );
+          if (!anchors.length) return;
+
+          const now = Date.now();
+          const cache = loadCache();
+          const toCheck = [];
+
+          for (const a of anchors) {
+            const url = a.href;
+            if (!/^https?:\/\//i.test(url)) continue;
+            const lowUrl = url.toLowerCase();
+            if (CHECK_SKIP_KEYWORDS.some((kw) => lowUrl.includes(kw))) continue;
+
+            const cached = cache[url];
+            if (cached && now - cached.ts < CACHE_TTL_MS) {
+              if (!cached.ok) a.classList.add("link-dead");
+              continue;
+            }
+            toCheck.push(a);
+          }
+
+          await runWithConcurrency(
+            toCheck,
+            async (a) => {
+              const url = a.href;
+              const ok = await checkLinkLikelyAlive(url);
+              cache[url] = { ok, ts: Date.now() };
+              if (!ok) a.classList.add("link-dead");
+            },
+            MAX_CONCURRENCY,
+          );
+
+          saveCache(cache);
+        }
+
+        markDeadLinks();
+      })();
+    </script>
+  </body>
 </html>
